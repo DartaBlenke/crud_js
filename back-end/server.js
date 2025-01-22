@@ -1,27 +1,33 @@
 const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-require('dotenv').config();
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey.json');
 
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+});
+
+const db = admin.firestore();
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 3000;
 
-// Middleware
-app.use(cors()); // Enable CORS for all routes
-app.use(bodyParser.json()); // Parse JSON request bodies
+// Test Firestore Connection
+app.get('/test-db', async (req, res) => {
+    try {
+        const testDoc = db.collection('test').doc('connection');
+        await testDoc.set({ message: 'Database connection successful!' });
+        const doc = await testDoc.get();
 
-// Example API route
-app.get('/', (req, res) => {
-    res.send('Server is running!');
+        if (!doc.exists) {
+            return res.status(404).send('No document found!');
+        }
+
+        res.status(200).send(doc.data());
+    } catch (error) {
+        console.error('Error testing database connection:', error);
+        res.status(500).send('Database connection failed.');
+    }
 });
 
-app.post('/api/data', (req, res) => {
-  const { name } = req.body; // Extract data from the request body
-  res.status(200).json({ message: `Hello, ${name}!` });
-});
-
-
-// Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
