@@ -1,24 +1,53 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import db from './firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+
+const firestore = getFirestore(App);
 
 function App() {
-    useEffect(() => {
-        const testFirestore = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'user'));
-                querySnapshot.forEach((doc) => {
-                    console.log(`${doc.id} =>`, doc.data());
-                });
-            } catch (error) {
-                console.error("Error connecting to Firestore:", error);
-            }
-        };
+    var [inputName, setIinputName] = useState("");
+    var [inputEmail, setinputEmail] = useState("");
+    
+    const handleChangeName = (event) => {
+        setIinputName(event.target.value);
+    };
 
-        testFirestore();
-    }, []);
+    const handleChangeEmail = (event) => {
+        setinputEmail(event.target.value);
+    };
 
-    return <div>Check the console for Firestore data!</div>;
+    const handleSubmit = async () => {
+        try {
+            const docRef = await addDoc(collection(firestore, "user"), {
+                name: inputName,
+                email: inputEmail
+            });
+            console.log("Document written with ID:", docRef.id);
+        } catch (e) {
+            console.error("Error adding document:", e);
+        }
+      };
+
+    return (
+        <div>
+            <h1>Faça seu login!</h1>
+            <div>
+                <h3>Nome</h3>
+                <input type="text" value={inputName} onChange={handleChangeName} placeholder="Nome"/>
+            </div>
+            <div>
+                <h3>email</h3>
+                <div>
+                    <input type="text" value={inputEmail} onChange={handleChangeEmail} placeholder="email" />
+                </div>
+            </div>
+
+            <button onClick={handleSubmit}>
+                Submit
+            </button>
+        </div>
+    )
+    
 }
 
 export default App;
