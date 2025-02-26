@@ -5,11 +5,11 @@ import { getFirestore, collection, addDoc } from 'firebase/firestore';
 const firestore = getFirestore(App);
 
 function App() {
-    var [inputName, setIinputName] = useState("");
+    var [inputName, setinputName] = useState("");
     var [inputEmail, setinputEmail] = useState("");
     
     const handleChangeName = (event) => {
-        setIinputName(event.target.value);
+        setinputName(event.target.value);
     };
 
     const handleChangeEmail = (event) => {
